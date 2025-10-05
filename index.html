@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXARIFY_ME</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font import and styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom blue accent for the animation theme */
+        .accent-bg {
+            background-color: #4A90E2; 
+        }
+        .accent-text {
+            color: #4A90E2;
+        }
+        /* Style the file input button nicely */
+        #photoFile {
+            padding: 0.75rem; /* Match other inputs */
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container p-6 sm:p-8 md:p-10 rounded-xl">
+    <!-- Header -->
+    <header class="text-center pb-6 border-b-2 border-gray-100">
+        <h1 class="text-3xl sm:text-4xl font-extrabold accent-text">PIXARIFY_ME 🎨</h1>
+        <p class="text-gray-500 mt-2 text-lg">Your photo, transformed into magic. Personal Use Only.</p>
+    </header>
+
+    <!-- Pricing Disclaimer -->
+    <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg text-sm text-gray-700">
+        <p class="font-semibold">Important Payment Note:</p>
+        <p>This form provides an **ESTIMATED PRICE**. After submission, we will manually review your photo(s) and send you a **Personalized PayPal Invoice** for the required 50% deposit.</p>
+    </div>
+
+    <!-- Commission Form -->
+    <form id="commissionForm" class="mt-8 space-y-6" onsubmit="handleFormSubmission(event)">
+        
+        <!-- Section 1: Contact & Referral -->
+        <h2 class="text-xl font-bold border-b pb-2 accent-text">1. Contact & Basics</h2>
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Your Name</label>
+            <input type="text" id="name" name="name" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+        </div>
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address (for Invoice)</label>
+            <input type="email" id="email" name="email" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+        </div>
+        <div>
+            <label for="instagram" class="block text-sm font-medium text-gray-700">Instagram Handle (for DMs & Tagging)</label>
+            <input type="text" id="instagram" name="instagram" placeholder="@yourhandle" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+        </div>
+        <div>
+            <label for="referral" class="block text-sm font-medium text-gray-700">How did you hear about us?</label>
+            <select id="referral" name="referral" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+                <option value="youtube">YouTube</option>
+                <option value="google">Google</option>
+                <option value="referral">Friend/Referral</option>
+                <option value="search">Online Search (General)</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <!-- Section 2: Order Details & Pricing -->
+        <h2 class="text-xl font-bold border-b pb-2 accent-text pt-4">2. The Magic Details</h2>
+        
+        <!-- Number of Pictures -->
+        <div>
+            <label for="numPictures" class="block text-sm font-medium text-gray-700 mb-2">No. of Pictures to Transform (Max 5)</label>
+            <input type="number" id="numPictures" name="numPictures" value="1" min="1" max="5" onchange="calculatePrice()" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <p class="text-xs text-gray-500 mt-1">Note: Each photo transformation is priced separately based on the tier selected below.</p>
+        </div>
+
+        <!-- Style Selection -->
+        <div>
+            <label for="styleTier" class="block text-sm font-medium text-gray-700 mb-2">Select Style & Base Tier (Price is PER PHOTO)</label>
+            <select id="styleTier" name="styleTier" onchange="toggleOtherStyle(this.value); calculatePrice();" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
+                <option value="" disabled selected>-- Choose a Style --</option>
+                <option value="5">Tier 1: Pencil Sketch / Sketch (Base $5/Photo)</option>
+                <option value="5">Tier 2: Classic Pixar Style (Base $5/Photo)</option>
+                <option value="5">Tier 2: Stylized Pixar Style (Base $5/Photo)</option>
+                <option value="5">Tier 2: GHIBLI Style (Base $5/Photo)</option>
+                <option value="7">Tier 3: Surprise Me! (Base $7/Photo - Includes Complex Detail)</option>
+                <option value="other">Other (Please Specify Below)</option>
+            </select>
+        </div>
+
+        <!-- Other Style Specification -->
+        <div id="otherStyleContainer" class="hidden">
+            <label for="otherStyleText" class="block text-sm font-medium text-gray-700">Specify 'Other' Style</label>
+            <input type="text" id="otherStyleText" name="otherStyleText" placeholder="e.g., Cyberpunk Anime, Vintage Comic" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+        </div>
+
+        <!-- Extra Subjects -->
+        <div>
+            <label for="extraSubjects" class="block text-sm font-medium text-gray-700 mb-2">Extra People/Pets in the Picture ($2 per subject - total across all photos)</label>
+            <input type="number" id="extraSubjects" name="extraSubjects" value="0" min="0" onchange="calculatePrice()" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+        </div>
+
+        <!-- Currency Selector -->
+        <div>
+            <label for="currencySelect" class="block text-sm font-medium text-gray-700 mb-2">Select Currency for Estimate</label>
+            <select id="currencySelect" onchange="calculatePrice()" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
+                <option value="USD">USD ($)</option>
+                <option value="INR">INR (₹) - Estimated</option>
+            </select>
+        </div>
+
+        <!-- File Upload -->
+        <h2 class="text-xl font-bold border-b pb-2 accent-text pt-4">3. Photo Reference & Notes</h2>
+        <div>
+            <label for="photoFile" class="block text-sm font-medium text-gray-700">Upload Reference Photo(s) (Max 5)</label>
+            <input type="file" id="photoFile" name="photoFile" accept="image/*" multiple max="5" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-accent-bg hover:file:bg-blue-100">
+            <p class="text-xs text-gray-500 mt-1">Note: We capture the file data on submission for review. Max 5 photos.</p>
+        </div>
+        <div>
+            <label for="photoNotes" class="block text-sm font-medium text-gray-700">Notes/Description for Photos</label>
+            <textarea id="photoNotes" name="photoNotes" rows="2" placeholder="Describe which photo corresponds to which style, or any specific instructions (e.g., 'Make the person in Photo 1 look like the Ghibli style')." class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg"></textarea>
+        </div>
+        
+        <!-- Total Price Display -->
+        <div class="pt-6 border-t-2 border-gray-200 space-y-3">
+            <div class="flex justify-between items-center text-lg font-semibold">
+                <span class="text-gray-700">ESTIMATED TOTAL PRICE:</span>
+                <span id="totalPrice" class="accent-text text-2xl font-extrabold">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center text-base font-medium p-2 bg-indigo-50 rounded-lg">
+                <span class="text-gray-800">50% DEPOSIT DUE TO START:</span>
+                <span id="depositDue" class="text-indigo-700 text-xl font-bold">$0.00</span>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-lg font-bold text-white accent-bg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-bg transition duration-150 ease-in-out">
+            Submit Order Request
+        </button>
+
+    </form>
+
+    <!-- Confirmation/Message Box (Hidden initially) -->
+    <div id="confirmationBox" class="hidden mt-8 p-6 bg-green-50 border-t-4 border-green-600 rounded-lg">
+        <h3 class="text-2xl font-extrabold text-green-700 mb-3">Order Submitted Successfully! 🎉</h3>
+        <p class="text-gray-800">Thank you, <span id="confName" class="font-bold"></span>! We have received your order details.</p>
+        <p class="mt-4 text-lg font-semibold text-gray-900">Your Next Step:</p>
+        <ol class="list-decimal list-inside mt-2 space-y-2 text-gray-700">
+            <li>We will **review your image(s) and options** to confirm the final price.</li>
+            <li>You will receive a **Personalized PayPal Invoice** for the **<span class="font-bold text-red-600">50% deposit</span>** at **<span id="confEmail" class="font-medium"></span>**.</li>
+            <li>Check your email (and Instagram DMs) within 1-2 hours. We will begin work immediately after payment is confirmed!</li>
+        </ol>
+        <p class="mt-4 text-xs text-gray-500">Note: The estimated deposit was <span id="confDeposit"></span>. Your final invoice will reflect this amount.</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        calculatePrice();
+    });
+    
+    // Fixed conversion rate for estimation purposes
+    const INR_RATE = 83.00; 
+
+    // Function to show/hide the 'Other' style text box
+    function toggleOtherStyle(selectedValue) {
+        const container = document.getElementById('otherStyleContainer');
+        if (selectedValue === 'other') {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+            document.getElementById('otherStyleText').value = ''; // Clear text if hidden
+        }
+    }
+
+    /**
+     * Converts a File object to a Base64 string using FileReader.
+     */
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    /**
+     * Calculates the estimated total price and required deposit based on user selections.
+     */
+    function calculatePrice() {
+        const styleTierElement = document.getElementById('styleTier');
+        const numPicturesElement = document.getElementById('numPictures');
+        const extraSubjectsElement = document.getElementById('extraSubjects');
+        const currencyElement = document.getElementById('currencySelect');
+
+        let basePricePerImage = parseFloat(styleTierElement.value) || 0;
+        
+        // Handle 'Other' selection for price estimation: if 'other' is selected, 
+        // default to the standard Tier 2 price ($5) for the estimate.
+        if (styleTierElement.value === 'other') {
+            basePricePerImage = 5; 
+        }
+
+        // 1. Calculate total base cost in USD
+        const numPictures = parseInt(numPicturesElement.value) || 1;
+        const totalBaseCostUSD = basePricePerImage * numPictures;
+        
+        // Calculate extra subjects cost ($2/subject)
+        const extraSubjects = parseInt(extraSubjectsElement.value) || 0;
+        const subjectsCostUSD = extraSubjects * 2; // Price is $2
+
+        // Add-on costs are zeroed out as requested
+        const rushFeeCostUSD = 0; 
+        const promptDeliveryCostUSD = 0;
+
+        // 2. Calculate final prices in USD
+        const estimatedTotalUSD = totalBaseCostUSD + subjectsCostUSD + rushFeeCostUSD + promptDeliveryCostUSD;
+        const depositAmountUSD = estimatedTotalUSD * 0.5;
+        
+        // 3. Apply currency conversion
+        const selectedCurrency = currencyElement.value;
+        let totalPriceDisplay, depositDisplay;
+        
+        if (selectedCurrency === 'INR') {
+            const finalTotalINR = estimatedTotalUSD * INR_RATE;
+            const finalDepositINR = depositAmountUSD * INR_RATE;
+            // Format to nearest whole rupee
+            totalPriceDisplay = `₹${finalTotalINR.toFixed(0)}`; 
+            depositDisplay = `₹${finalDepositINR.toFixed(0)}`;
+        } else { // Default to USD
+            totalPriceDisplay = `$${estimatedTotalUSD.toFixed(2)}`;
+            depositDisplay = `$${depositAmountUSD.toFixed(2)}`;
+        }
+
+        // 4. Display results
+        document.getElementById('totalPrice').textContent = totalPriceDisplay;
+        document.getElementById('depositDue').textContent = depositDisplay;
+    }
+
+    /**
+     * Handles the form submission by showing the confirmation message and logging file data.
+     */
+    async function handleFormSubmission(event) {
+        event.preventDefault(); // Stop the default form submission
+
+        // Recalculate to ensure final numbers are correct
+        calculatePrice();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const depositDue = document.getElementById('depositDue').textContent; 
+        const photoFiles = document.getElementById('photoFile').files;
+        
+        // Convert files to Base64 data (simulating upload)
+        const filePromises = [];
+        for (let i = 0; i < photoFiles.length; i++) {
+            filePromises.push(fileToBase64(photoFiles[i]));
+        }
+
+        let uploadedFileDetails = [];
+        try {
+            const base64Results = await Promise.all(filePromises);
+            uploadedFileDetails = base64Results.map((data, index) => ({
+                fileName: photoFiles[index].name,
+                fileSize: (photoFiles[index].size / 1024).toFixed(2) + ' KB',
+                dataUrl: data.substring(0, 50) + '... (Base64 data captured)'
+            }));
+        } catch (error) {
+            console.error("Error reading files:", error);
+            // Fallback message for user
+            alert("There was an error processing the image files. Please try again.");
+            return; 
+        }
+
+        // Update confirmation box with client details
+        document.getElementById('confName').textContent = name;
+        document.getElementById('confEmail').textContent = email;
+        document.getElementById('confDeposit').textContent = depositDue; 
+
+        // Hide the form and show the confirmation box
+        document.getElementById('commissionForm').classList.add('hidden');
+        document.getElementById('confirmationBox').classList.remove('hidden');
+
+        // Output all relevant data to console (simulating sending data for manual review)
+        console.log("--- Commission Request Submitted ---");
+        console.log("Name:", name);
+        console.log("Email:", email);
+        console.log("Instagram:", document.getElementById('instagram').value);
+        console.log("Referral:", document.getElementById('referral').value);
+        console.log("Num Pictures Requested:", document.getElementById('numPictures').value);
+        console.log("Style Selected:", document.getElementById('styleTier').options[document.getElementById('styleTier').selectedIndex].text);
+        if (document.getElementById('otherStyleText').value) {
+            console.log("Other Style Specified:", document.getElementById('otherStyleText').value);
+        }
+        console.log("Extra Subjects:", document.getElementById('extraSubjects').value);
+        console.log("Photo Notes:", document.getElementById('photoNotes').value);
+        console.log("--- Uploaded File Details (Base64) ---");
+        console.log(uploadedFileDetails);
+        console.log("Total Estimated Price:", document.getElementById('totalPrice').textContent);
+        console.log("Deposit Estimated:", document.getElementById('depositDue').textContent);
+    }
+</script>
+
+</body>
+</html>
