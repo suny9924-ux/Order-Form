@@ -32,10 +32,12 @@
             color: #4A90E2;
         }
         /* Style the file input button nicely */
-        #photoFile {
-            padding: 0.75rem; /* Match other inputs */
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
+        /* Hides the default file input button */
+        #hiddenPhotoInput {
+            display: none;
+        }
+        .upload-button {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -54,26 +56,27 @@
         <p>This form provides an **ESTIMATED PRICE**. After submission, we will manually review your photo(s) and send you a **Personalized PayPal Invoice** for the required 50% deposit.</p>
     </div>
 
-    <!-- Commission Form -->
-    <form id="commissionForm" class="mt-8 space-y-6" onsubmit="handleFormSubmission(event)">
+    <!-- COMMISSION FORM: NOW CONFIGURED FOR EMAIL SUBMISSION VIA FORMSUBMIT -->
+    <form id="commissionForm" class="mt-8 space-y-6" action="https://formsubmit.co/pixarify@gmail.com" method="POST" enctype="multipart/form-data">
         
         <!-- Section 1: Contact & Referral -->
         <h2 class="text-xl font-bold border-b pb-2 accent-text">1. Contact & Basics</h2>
         <div>
             <label for="name" class="block text-sm font-medium text-gray-700">Your Name</label>
-            <input type="text" id="name" name="name" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="text" id="name" name="Name" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
         </div>
         <div>
+            <!-- IMPORTANT: Name changed to _replyto to capture the sender's email for easy reply -->
             <label for="email" class="block text-sm font-medium text-gray-700">Email Address (for Invoice)</label>
-            <input type="email" id="email" name="email" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="email" id="email" name="_replyto" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
         </div>
         <div>
             <label for="instagram" class="block text-sm font-medium text-gray-700">Instagram Handle (for DMs & Tagging)</label>
-            <input type="text" id="instagram" name="instagram" placeholder="@yourhandle" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="text" id="instagram" name="Instagram Handle" placeholder="@yourhandle" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
         </div>
         <div>
             <label for="referral" class="block text-sm font-medium text-gray-700">How did you hear about us?</label>
-            <select id="referral" name="referral" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
+            <select id="referral" name="Referral Source" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
                 <option value="instagram">Instagram</option>
                 <option value="facebook">Facebook</option>
                 <option value="youtube">YouTube</option>
@@ -90,14 +93,14 @@
         <!-- Number of Pictures -->
         <div>
             <label for="numPictures" class="block text-sm font-medium text-gray-700 mb-2">No. of Pictures to Transform (Max 5)</label>
-            <input type="number" id="numPictures" name="numPictures" value="1" min="1" max="5" onchange="calculatePrice()" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="number" id="numPictures" name="Pictures Requested" value="1" min="1" max="5" onchange="calculatePrice()" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
             <p class="text-xs text-gray-500 mt-1">Note: Each photo transformation is priced separately based on the tier selected below.</p>
         </div>
 
         <!-- Style Selection -->
         <div>
             <label for="styleTier" class="block text-sm font-medium text-gray-700 mb-2">Select Style & Base Tier (Price is PER PHOTO)</label>
-            <select id="styleTier" name="styleTier" onchange="toggleOtherStyle(this.value); calculatePrice();" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
+            <select id="styleTier" name="Style Selection" onchange="toggleOtherStyle(this.value); calculatePrice();" required class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
                 <option value="" disabled selected>-- Choose a Style --</option>
                 <option value="5">Tier 1: Pencil Sketch / Sketch (Base $5/Photo)</option>
                 <option value="5">Tier 2: Classic Pixar Style (Base $5/Photo)</option>
@@ -111,16 +114,16 @@
         <!-- Other Style Specification -->
         <div id="otherStyleContainer" class="hidden">
             <label for="otherStyleText" class="block text-sm font-medium text-gray-700">Specify 'Other' Style</label>
-            <input type="text" id="otherStyleText" name="otherStyleText" placeholder="e.g., Cyberpunk Anime, Vintage Comic" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="text" id="otherStyleText" name="Other Style Details" placeholder="e.g., Cyberpunk Anime, Vintage Comic" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
         </div>
 
         <!-- Extra Subjects -->
         <div>
             <label for="extraSubjects" class="block text-sm font-medium text-gray-700 mb-2">Extra People/Pets in the Picture ($2 per subject - total across all photos)</label>
-            <input type="number" id="extraSubjects" name="extraSubjects" value="0" min="0" onchange="calculatePrice()" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
+            <input type="number" id="extraSubjects" name="Extra Subjects" value="0" min="0" onchange="calculatePrice()" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg">
         </div>
 
-        <!-- Currency Selector -->
+        <!-- Currency Selector (Used for Display only, price remains fixed USD) -->
         <div>
             <label for="currencySelect" class="block text-sm font-medium text-gray-700 mb-2">Select Currency for Estimate</label>
             <select id="currencySelect" onchange="calculatePrice()" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg bg-white">
@@ -131,16 +134,40 @@
 
         <!-- File Upload -->
         <h2 class="text-xl font-bold border-b pb-2 accent-text pt-4">3. Photo Reference & Notes</h2>
-        <div>
-            <label for="photoFile" class="block text-sm font-medium text-gray-700">Upload Reference Photo(s) (Max 5)</label>
-            <input type="file" id="photoFile" name="photoFile" accept="image/*" multiple max="5" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-accent-bg hover:file:bg-blue-100">
-            <p class="text-xs text-gray-500 mt-1">Note: We capture the file data on submission for review. Max 5 photos.</p>
+        <div class="space-y-2">
+            <!-- Hidden File Input (Used by JS to open dialog) -->
+            <input type="file" id="hiddenPhotoInput" name="upload[]" accept="image/*" multiple max="5" onchange="handleNewFiles(event)">
+            
+            <!-- Custom Upload Button -->
+            <label for="hiddenPhotoInput" class="upload-button w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-semibold text-white accent-bg hover:bg-blue-600 transition duration-150 ease-in-out">
+                + Add Photo(s) (Max 5 Total)
+            </label>
+            
+            <!-- File Name Display Container -->
+            <div id="fileSummary" class="text-sm pt-1">
+                <p id="fileCountText" class="text-gray-700 font-semibold">No files selected.</p>
+                <ul id="fileList" class="mt-1 text-sm text-gray-600 space-y-1"></ul>
+            </div>
+            
+            <!-- Clear Button -->
+            <button type="button" onclick="clearPhotoUpload()" id="clearButton" class="p-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition duration-150 ease-in-out w-full" style="display: none;">
+                Clear All Uploaded Files
+            </button>
+            
+            <!-- The actual file input field to submit the files is created dynamically in JS -->
+            <div id="dynamicFileInputContainer" style="display: none;"></div>
+
+            <p class="text-xs text-gray-500 mt-1">Note: FormSubmit will attach your files to the order email (up to 25MB total).</p>
         </div>
         <div>
             <label for="photoNotes" class="block text-sm font-medium text-gray-700">Notes/Description for Photos</label>
-            <textarea id="photoNotes" name="photoNotes" rows="2" placeholder="Describe which photo corresponds to which style, or any specific instructions (e.g., 'Make the person in Photo 1 look like the Ghibli style')." class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg"></textarea>
+            <textarea id="photoNotes" name="Photo Notes" rows="2" placeholder="Describe which photo corresponds to which style, or any specific instructions (e.g., 'Make the person in Photo 1 look like the Ghibli style')." class="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-accent-bg focus:border-accent-bg"></textarea>
         </div>
         
+        <!-- Hidden Fields for Price Data Capture -->
+        <input type="hidden" name="ESTIMATED TOTAL PRICE" id="hiddenTotalPrice">
+        <input type="hidden" name="50% DEPOSIT DUE" id="hiddenDepositDue">
+
         <!-- Total Price Display -->
         <div class="pt-6 border-t-2 border-gray-200 space-y-3">
             <div class="flex justify-between items-center text-lg font-semibold">
@@ -158,25 +185,44 @@
             Submit Order Request
         </button>
 
+        <!-- FormSubmit Redirect/Honeypot -->
+        <!-- This redirects the user back to the form page with a success message -->
+        <input type="hidden" name="_next" value="[YOUR-HOSTED-FORM-URL]?submitted=true">
+        <input type="text" name="_gotcha" style="display:none">
     </form>
-
-    <!-- Confirmation/Message Box (Hidden initially) -->
-    <div id="confirmationBox" class="hidden mt-8 p-6 bg-green-50 border-t-4 border-green-600 rounded-lg">
-        <h3 class="text-2xl font-extrabold text-green-700 mb-3">Order Submitted Successfully! 🎉</h3>
-        <p class="text-gray-800">Thank you, <span id="confName" class="font-bold"></span>! We have received your order details.</p>
-        <p class="mt-4 text-lg font-semibold text-gray-900">Your Next Step:</p>
-        <ol class="list-decimal list-inside mt-2 space-y-2 text-gray-700">
-            <li>We will **review your image(s) and options** to confirm the final price.</li>
-            <li>You will receive a **Personalized PayPal Invoice** for the **<span class="font-bold text-red-600">50% deposit</span>** at **<span id="confEmail" class="font-medium"></span>**.</li>
-            <li>Check your email (and Instagram DMs) within 1-2 hours. We will begin work immediately after payment is confirmed!</li>
-        </ol>
-        <p class="mt-4 text-xs text-gray-500">Note: The estimated deposit was <span id="confDeposit"></span>. Your final invoice will reflect this amount.</p>
-    </div>
+    
 </div>
 
 <script>
+    // Global storage array for all files
+    let fileStorage = [];
+    const MAX_FILES = 5;
+
     document.addEventListener('DOMContentLoaded', () => {
+        // Run calculation on load
         calculatePrice();
+        
+        // FormSubmit Success Handling
+        if (window.location.search.includes('submitted=true')) {
+            const formContainer = document.querySelector('.form-container');
+            // This is the success message HTML that replaces the form content
+            formContainer.innerHTML = `
+                <div class="p-6 bg-green-50 border-t-4 border-green-600 rounded-xl text-center">
+                    <h3 class="text-3xl font-extrabold text-green-700 mb-4">Order Submitted Successfully! 🎉</h3>
+                    <p class="text-gray-800 text-lg">Thank you! Your order request and photo(s) have been sent.</p>
+                    <p class="mt-4 text-lg font-semibold text-gray-900">Your Next Step:</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-2 text-gray-700 text-left mx-auto max-w-sm">
+                        <li>We will **review your image(s)** and confirm the final price.</li>
+                        <li>You will receive a **Personalized PayPal Invoice** for the **50% deposit** via the email you provided within 1-2 hours.</li>
+                        <li>We begin work immediately after payment is confirmed!</li>
+                    </ol>
+                    <a href="${window.location.pathname}" class="mt-6 inline-block bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition">Start New Order</a>
+                </div>
+            `;
+        }
+
+        // Attach event listener to the form to handle dynamic file submission
+        document.getElementById('commissionForm').addEventListener('submit', prepareFormForSubmission);
     });
     
     // Fixed conversion rate for estimation purposes
@@ -192,18 +238,117 @@
             document.getElementById('otherStyleText').value = ''; // Clear text if hidden
         }
     }
+    
+    /**
+     * Handles new files selected by the user, appending them to fileStorage.
+     */
+    function handleNewFiles(event) {
+        const newFiles = event.target.files;
+        
+        if (fileStorage.length + newFiles.length > MAX_FILES) {
+            alert(`You can only upload a maximum of ${MAX_FILES} files. Please clear your current selection or reduce the number of files.`);
+            // Reset the hidden file input so the user can try again
+            event.target.value = null; 
+            return;
+        }
+
+        // Append new files to the global storage
+        for (let i = 0; i < newFiles.length; i++) {
+            fileStorage.push(newFiles[i]);
+        }
+        
+        // Clear the hidden file input to allow re-selection of files
+        event.target.value = null;
+
+        displayFileNames();
+    }
+    
+    /**
+     * Clears the file input field and the displayed file list.
+     */
+    function clearPhotoUpload() {
+        fileStorage = []; // Clears the global file storage array
+        
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = ''; // Clears the list display
+        
+        const fileCountText = document.getElementById('fileCountText');
+        fileCountText.textContent = 'No files selected.'; // Clears the total count text
+        
+        document.getElementById('clearButton').style.display = 'none';
+        
+        // Remove old dynamic inputs to ensure clean slate
+        const container = document.getElementById('dynamicFileInputContainer');
+        container.innerHTML = '';
+    }
+    
+    /**
+     * Displays the names and count of all currently selected files.
+     */
+    function displayFileNames() {
+        const fileList = document.getElementById('fileList');
+        const fileCountText = document.getElementById('fileCountText');
+        
+        fileList.innerHTML = ''; // Clear existing list
+        
+        const fileCount = fileStorage.length;
+        
+        if (fileCount > 0) {
+            // Update the total count text
+            fileCountText.textContent = `Total Files Uploaded: ${fileCount}`;
+            document.getElementById('clearButton').style.display = 'block';
+
+            // List individual file names
+            fileStorage.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.className = 'flex items-center';
+                // Display file name with a checkmark icon (tailwind class)
+                listItem.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>${file.name}</span>`;
+                fileList.appendChild(listItem);
+            });
+        } else {
+             fileCountText.textContent = 'No files selected.';
+             document.getElementById('clearButton').style.display = 'none';
+        }
+    }
 
     /**
-     * Converts a File object to a Base64 string using FileReader.
+     * Updates the hidden fields with the final calculated price for submission.
      */
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
+    function updateHiddenPriceFields(estimatedTotalUSD, depositAmountUSD) {
+        // We submit the price in USD, regardless of the display currency
+        document.getElementById('hiddenTotalPrice').value = `$${estimatedTotalUSD.toFixed(2)} USD`;
+        document.getElementById('hiddenDepositDue').value = `$${depositAmountUSD.toFixed(2)} USD`;
     }
+
+    /**
+     * Prepares the form for final submission by dynamically creating file inputs for FormSubmit.
+     */
+    function prepareFormForSubmission(event) {
+        if (fileStorage.length === 0) {
+            alert('Please upload at least one photo reference to submit your order.');
+            event.preventDefault();
+            return;
+        }
+
+        const container = document.getElementById('dynamicFileInputContainer');
+        container.innerHTML = ''; // Clear previous inputs
+
+        // Create a new file input element for submission
+        // FormData will read the content of this input field
+        const dataTransfer = new DataTransfer();
+        fileStorage.forEach(file => dataTransfer.items.add(file));
+
+        const finalInput = document.createElement('input');
+        finalInput.setAttribute('type', 'file');
+        finalInput.setAttribute('name', 'upload[]'); // Crucial for FormSubmit multi-file
+        finalInput.files = dataTransfer.files;
+        
+        container.appendChild(finalInput);
+        
+        // Allow native form submission to proceed
+    }
+
 
     /**
      * Calculates the estimated total price and required deposit based on user selections.
@@ -228,7 +373,7 @@
         
         // Calculate extra subjects cost ($2/subject)
         const extraSubjects = parseInt(extraSubjectsElement.value) || 0;
-        const subjectsCostUSD = extraSubjects * 2; // Price is $2
+        const subjectsCostUSD = extraSubjects * 2; 
 
         // Add-on costs are zeroed out as requested
         const rushFeeCostUSD = 0; 
@@ -238,7 +383,10 @@
         const estimatedTotalUSD = totalBaseCostUSD + subjectsCostUSD + rushFeeCostUSD + promptDeliveryCostUSD;
         const depositAmountUSD = estimatedTotalUSD * 0.5;
         
-        // 3. Apply currency conversion
+        // Update hidden fields before displaying (for submission)
+        updateHiddenPriceFields(estimatedTotalUSD, depositAmountUSD);
+
+        // 3. Apply currency conversion for DISPLAY
         const selectedCurrency = currencyElement.value;
         let totalPriceDisplay, depositDisplay;
         
@@ -256,69 +404,6 @@
         // 4. Display results
         document.getElementById('totalPrice').textContent = totalPriceDisplay;
         document.getElementById('depositDue').textContent = depositDisplay;
-    }
-
-    /**
-     * Handles the form submission by showing the confirmation message and logging file data.
-     */
-    async function handleFormSubmission(event) {
-        event.preventDefault(); // Stop the default form submission
-
-        // Recalculate to ensure final numbers are correct
-        calculatePrice();
-
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const depositDue = document.getElementById('depositDue').textContent; 
-        const photoFiles = document.getElementById('photoFile').files;
-        
-        // Convert files to Base64 data (simulating upload)
-        const filePromises = [];
-        for (let i = 0; i < photoFiles.length; i++) {
-            filePromises.push(fileToBase64(photoFiles[i]));
-        }
-
-        let uploadedFileDetails = [];
-        try {
-            const base64Results = await Promise.all(filePromises);
-            uploadedFileDetails = base64Results.map((data, index) => ({
-                fileName: photoFiles[index].name,
-                fileSize: (photoFiles[index].size / 1024).toFixed(2) + ' KB',
-                dataUrl: data.substring(0, 50) + '... (Base64 data captured)'
-            }));
-        } catch (error) {
-            console.error("Error reading files:", error);
-            // Fallback message for user
-            alert("There was an error processing the image files. Please try again.");
-            return; 
-        }
-
-        // Update confirmation box with client details
-        document.getElementById('confName').textContent = name;
-        document.getElementById('confEmail').textContent = email;
-        document.getElementById('confDeposit').textContent = depositDue; 
-
-        // Hide the form and show the confirmation box
-        document.getElementById('commissionForm').classList.add('hidden');
-        document.getElementById('confirmationBox').classList.remove('hidden');
-
-        // Output all relevant data to console (simulating sending data for manual review)
-        console.log("--- Commission Request Submitted ---");
-        console.log("Name:", name);
-        console.log("Email:", email);
-        console.log("Instagram:", document.getElementById('instagram').value);
-        console.log("Referral:", document.getElementById('referral').value);
-        console.log("Num Pictures Requested:", document.getElementById('numPictures').value);
-        console.log("Style Selected:", document.getElementById('styleTier').options[document.getElementById('styleTier').selectedIndex].text);
-        if (document.getElementById('otherStyleText').value) {
-            console.log("Other Style Specified:", document.getElementById('otherStyleText').value);
-        }
-        console.log("Extra Subjects:", document.getElementById('extraSubjects').value);
-        console.log("Photo Notes:", document.getElementById('photoNotes').value);
-        console.log("--- Uploaded File Details (Base64) ---");
-        console.log(uploadedFileDetails);
-        console.log("Total Estimated Price:", document.getElementById('totalPrice').textContent);
-        console.log("Deposit Estimated:", document.getElementById('depositDue').textContent);
     }
 </script>
 
